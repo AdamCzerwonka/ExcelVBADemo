@@ -1,0 +1,66 @@
+Sub Makro1()
+Dim fb As Office.FileDialog
+
+Set fb = Application.FileDialog(msoFileDialogFilePicker)
+
+With fb
+    .AllowMultiSelect = False
+    .Title = "Wybierz Plik"
+    .Filters.Clear
+    .Filters.Add "Pliki csv", "*.csv"
+    .Filters.Add "Wszytskie Pliki", "*.*"
+    
+    If .Show = True Then
+        plik = .SelectedItems(1)
+        
+        Open plik For Input As #1
+        
+        numer_wiersza = 0
+        
+        Do Until EOF(1)
+            Line Input #1, LineFromFile
+            
+            dane = Split(LineFromFile, ",")
+            
+            ActiveCell.Offset(numer_wiersza, 1).NumberFormat = 0
+            ActiveCell.Offset(numer_wiersza, 1).HorizontalAlignment = xlLeft
+            
+            ActiveCell.Offset(numer_wiersza, 0).NumberFormat = "@"
+            ActiveCell.Offset(numer_wiersza, 0).Value = CStr(numer_wiersza + 1) + "."
+            
+            With ActiveCell.Offset(numer_wiersza, 0).Borders
+                    .LineStyle = xlContinuous
+                    .Color = vbBlack
+                    .Weight = xlThin
+            End With
+            
+            ActiveCell.ColumnWidth = 6
+            ActiveCell.Offset(0, 1).ColumnWidth = 20
+            ActiveCell.Offset(0, 2).ColumnWidth = 15
+            ActiveCell.Offset(0, 3).ColumnWidth = 15
+            ActiveCell.Offset(0, 4).ColumnWidth = 30
+            
+
+            For i = 0 To ArrayLen(dane) - 1
+                ActiveCell.Offset(numer_wiersza, i + 1).Value = dane(i)
+                
+                With ActiveCell.Offset(numer_wiersza, i + 1).Borders
+                    .LineStyle = xlContinuous
+                    .Color = vbBlack
+                    .Weight = xlThin
+                End With
+            Next i
+            
+            numer_wiersza = numer_wiersza + 1
+            
+        Loop
+        
+        Close #1
+        
+    End If
+    
+End With
+End Sub
+Public Function ArrayLen(arr As Variant) As Integer
+    ArrayLen = UBound(arr) - LBound(arr) + 1
+End Function
